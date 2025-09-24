@@ -10,21 +10,37 @@ import SwiftData
 
 struct ContentView: View {
     @State private var title = ""
+    @State private var isShowCompleted = false
     
     @Environment(\.modelContext) private var context
     @Query() var categories: [Category]
     @Query(filter: #Predicate<Todo> { $0.category == nil }) var todos: [Todo]
     
     var body: some View {
-        VStack() {
+        VStack {
             HStack {
                 Text("Home").font(.title).bold()
                 Spacer()
                 Circle().frame(width: 32, height: 32).foregroundStyle(.blue)
             }
+            
+            TabBar(isShowCompleted: $isShowCompleted)
+            
+            HStack {
+                Text("Categories")
+                Spacer()
+                Button("Add", action: {})
+                    .frame(height: 30)
+                    .padding(.horizontal, 12)
+                    .background(.black)
+                    .cornerRadius(100)
+                    .bold()
+                    .foregroundStyle(.white)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment:.topLeading)
         .padding(.horizontal, 16)
+        
 //        ForEach(categories) { category in
 //            Text(category.title).background(Color(hex: category.color))
 //        }

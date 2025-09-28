@@ -23,11 +23,15 @@ struct ContentView: View {
                 Spacer()
                 Circle().frame(width: 32, height: 32).foregroundStyle(.blue)
             }
+            .padding(.horizontal, 16)
             
             TabBar(isShowCompleted: $isShowCompleted)
+                .padding(.horizontal, 16)
             
             HStack {
                 Text("Categories")
+                    .font(.title3)
+                    .bold()
                 Spacer()
                 Button("Add", action: {})
                     .frame(height: 30)
@@ -37,9 +41,19 @@ struct ContentView: View {
                     .bold()
                     .foregroundStyle(.white)
             }
+            .padding(.horizontal, 16)
+            
+            ScrollView(.horizontal) {
+                HStack(spacing: 16) {
+                    ForEach(categories) { category in
+                        CategoryView(category: category, isActive: false)
+                    }
+                }
+                .padding(.vertical, 20)
+                .padding(.horizontal, 16)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment:.topLeading)
-        .padding(.horizontal, 16)
         
 //        ForEach(categories) { category in
 //            Text(category.title).background(Color(hex: category.color))

@@ -6,24 +6,24 @@
 //
 
 import Foundation
-import SwiftData
-import SwiftUI
+import RealmSwift
 
-@Model
-class Category: Identifiable {
-    var id: UUID
-    var title: String
-    var icon: String
-    var color: String
+class Category: Object, Identifiable {
+    @Persisted(primaryKey: true) var id: ObjectId
+    @Persisted var title: String
+    @Persisted var icon: String
+    @Persisted var color: String
+    @Persisted var todos: List<Todo>
     
-    @Relationship(deleteRule: .cascade, inverse: \Todo.category)
-    var todos: [Todo]
-    
-    init(id: UUID = UUID(), title: String, icon: String, color: String, todos: [Todo]) {
-        self.id = id
+    convenience init(title: String, icon: String, color: String, todos: [Todo] = []) {
+        self.init()
         self.title = title
         self.icon = icon
         self.color = color
-        self.todos = todos
+        self.todos.append(objectsIn: todos)
+        
+        for todo in todos {
+            todo.category = self
+        }
     }
 }

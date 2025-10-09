@@ -6,15 +6,14 @@
 //
 
 import SwiftUI
-import SwiftData
+import RealmSwift
 
 struct ContentView: View {
     @State private var title = ""
     @State private var isShowCompleted = false
     
-    @Environment(\.modelContext) private var context
-    @Query() var categories: [Category]
-    @Query(filter: #Predicate<Todo> { $0.category == nil }) var todos: [Todo]
+    @Environment(\.realm) private var realm
+    @StateObject var viewModel: ContentViewModel
     
     var body: some View {
         VStack {
@@ -45,8 +44,14 @@ struct ContentView: View {
             
             ScrollView(.horizontal) {
                 HStack(spacing: 16) {
-                    ForEach(categories) { category in
-                        CategoryView(category: category, isActive: false)
+                    ForEach(viewModel.categories) { category in
+                        CategoryView(
+                            category: category,
+                            isActive: viewModel.selectedCategory == category,
+                            onPress: {
+                                viewModel.selectCategory(category)
+                            }
+                        )
                     }
                 }
                 .padding(.vertical, 20)
@@ -54,21 +59,21 @@ struct ContentView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment:.topLeading)
-        
-//        ForEach(categories) { category in
-//            Text(category.title).background(Color(hex: category.color))
-//        }
-//        ForEach(todos) { todo in
-//            Text(todo.title)
-//        }
-//        TextField("Title", text: $title)
-//        Image(systemName: "house.fill")
-//        Button("add todo") {
-//            context.insert(Todo(title: title, isChecked: false))
-//        }
+    
+        ForEach(viewModel.todos) { todo in
+            Text(todo.title)
+        }
+        TextField("Title", text: $title)
+        Button("add todo", action: {
+            viewModel.addTodo(title: title)
+            title = ""
+        })
     }
 }
 
-#Preview(traits: .categorySampleData) {
-    ContentView()
+#Preview() {
+    let realm = InMemoryRealmProvider.make(identifier: "HomeScreen")
+    Category.createSampleData(in: realm)
+    return ContentView(viewModel: ContentViewModel(realm: realm))
+        .environment(\.realm, realm)
 }

@@ -6,18 +6,18 @@
 //
 
 import Foundation
-import SwiftData
+import RealmSwift
 
-@Model
-class Todo: Identifiable {
-    var id: UUID
-    var title: String
-    var isChecked: Bool
-    var category: Category?
+class Todo: Object, Identifiable {
+    @Persisted(primaryKey: true) var id: ObjectId
+    @Persisted var title: String
+    @Persisted var isChecked: Bool
+    @Persisted var category: Category?
     
-    init(id: UUID = UUID(), title: String, isChecked: Bool) {
-        self.id = id
+    convenience init(title: String, isChecked: Bool, category: Category? = nil) {
+        self.init()
         self.title = title
         self.isChecked = isChecked
+        self.category = category
     }
 }

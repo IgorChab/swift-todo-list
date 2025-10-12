@@ -21,6 +21,12 @@ class ContentViewModel: ObservableObject {
         }
     }
     
+    @Published var isShowCompleted = false {
+        didSet {
+            observeTodos()
+        }
+    }
+    
     func selectCategory(_ category: Category) -> Void {
         if (selectedCategory == category) {
             selectedCategory = nil
@@ -40,6 +46,27 @@ class ContentViewModel: ObservableObject {
         }
     }
     
+    func toggleCheckedTodo(_ todo: Todo) {
+        do {
+            try realm.write {
+                todo.isChecked = !todo.isChecked
+            }
+        } catch let error {
+            print("Failed to add todo in realm with error: \(error.localizedDescription)")
+        }
+    }
+    
+    func deleteTodo(_ todo: Todo) {
+        do {
+            self.todos = self.todos.filter { $0 != todo }
+            try realm.write {
+                realm.delete(todo)
+            }
+        } catch let error {
+            print("Failed to delete todo in realm with error: \(error.localizedDescription)")
+        }
+    }
+    
     init(realm: Realm) {
         self.realm = realm
         observeCategories()
@@ -50,13 +77,6 @@ class ContentViewModel: ObservableObject {
         categoriesToken?.invalidate()
         
         let categories = realm.objects(Category.self)
-        
-        for category in categories {
-            print("📁 Категория: \(category.title), задач: \(category.todos.count)")
-            for todo in category.todos {
-                print("   • \(todo.title)")
-            }
-        }
         
         categoriesToken = categories.observe { [weak self] changes in
             switch changes {
@@ -74,25 +94,18 @@ class ContentViewModel: ObservableObject {
         
         var todos = realm.objects(Todo.self)
         
-        for todo in todos {
-            if let category = todo.category {
-                print("✅ \(todo.title) → категория: \(category.title)")
-            } else {
-                print("⚠️ \(todo.title) → категории нет (nil)")
-            }
+        if isShowCompleted == true {
+            todos = todos.where { $0.isChecked == isShowCompleted }
         }
         
         if let selectedCategory {
-            print("in selectedCategory block")
             todos = todos.where {
                 $0.category.id == selectedCategory.id
             }
         } else {
-            print("in selectedCategory = nil block")
             todos = todos.where {
                 $0.category == nil
             }
-            print(todos.count)
         }
         
         todoaToken = todos.observe { [weak self] changes in

@@ -55,7 +55,9 @@ struct CategoryView: View {
                         }
                     }
                 }
-                .shadow(color: Color(hex: category.color, alpha: 0.3), radius: 10, x: 0, y: 0)
+                .if(isActive) {
+                    $0.shadow(color: Color(hex: category.color, alpha: 0.7), radius: 10, x: 0, y: 1)
+                }
                 .frame(width: 112, height: 136)
         }
     }

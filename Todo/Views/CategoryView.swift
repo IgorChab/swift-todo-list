@@ -63,6 +63,6 @@ struct CategoryView: View {
     }
 }
 
-//#Preview {
-//    CategoryView(category: Category.sampleData[0], isActive: true, onPress: {})
-//}
+#Preview {
+    CategoryView(category: Category.sampleData[0], isActive: true, onPress: {})
+}

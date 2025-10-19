@@ -5,29 +5,32 @@
 //  Created by Чабанчук Игорь Романович on 14.10.2025.
 //
 
-protocol ModalProps {
-    var isVisible: Bool { get set }
-    var isClosable: Bool { get }
-}
-
 import SwiftUI
 
-struct Modal<Content: View>: View, ModalProps {
+struct Modal<Content: View>: View {
     @Binding var isVisible: Bool
     let isClosable: Bool
+    var onClose: (() -> Void)?
     @ViewBuilder var content: () -> Content
     @State private var offsetY: CGFloat = 1000
     @State private var opacity: Double = 0
     
     func closeModal() {
-        withAnimation {
-            offsetY = 1000
-            opacity = 0
-            isVisible = false
+        isVisible = false
+        
+        if let onClose {
+            onClose()
         }
     }
     
-    func openModal() {
+    func runCloseAnimation() {
+        withAnimation {
+            offsetY = 1000
+            opacity = 0
+        }
+    }
+    
+    func runOpenAnimation() {
         withAnimation(.spring(bounce: 0.2)) {
             offsetY = 0
             opacity = 0.3
@@ -67,16 +70,16 @@ struct Modal<Content: View>: View, ModalProps {
         .ignoresSafeArea()
         .onChange(of: isVisible) {
             if (isVisible) {
-                openModal()
+                runOpenAnimation()
             } else {
-                closeModal()
+                runCloseAnimation()
             }
         }
         .onAppear {
             if (isVisible) {
-                openModal()
+                runOpenAnimation()
             } else {
-                closeModal()
+                runCloseAnimation()
             }
         }
     }
@@ -90,7 +93,7 @@ struct Modal<Content: View>: View, ModalProps {
             isVisible = !isVisible
         }
         
-        Modal(isVisible: $isVisible, isClosable: true) {
+        Modal(isVisible: $isVisible, isClosable: true, onClose: { print("onClose") }) {
             VStack(alignment: .leading) {
                 Text("Title")
                     .font(.title)

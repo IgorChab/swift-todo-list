@@ -35,6 +35,17 @@ class ContentViewModel: ObservableObject {
         }
     }
     
+    func createCategory(title: String, icon: String, color: String) {
+        do {
+            try realm.write {
+                let category = Category(title: title, icon: icon, color: color)
+                realm.add(category)
+            }
+        } catch let error {
+            print("Failed to create category in realm with error: \(error.localizedDescription)")
+        }
+    }
+    
     func addTodo(title: String) {
         do {
             try realm.write {

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct AddTodoModal: View, ModalProps {
+struct AddTodoModal: View {
     @Binding var isVisible: Bool
     var isClosable: Bool = true
     let onSave: (_ title: String) -> Void

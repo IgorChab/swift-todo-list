@@ -10,7 +10,8 @@ import RealmSwift
 
 struct ContentView: View {
     @State private var title = ""
-    @State private var isModalVisible = false
+    @State private var isTaskModalVisible = false
+    @State private var isCategoryModalVisible = false
     
     @Environment(\.realm) private var realm
     @StateObject var viewModel: ContentViewModel
@@ -33,7 +34,9 @@ struct ContentView: View {
                         .font(.title3)
                         .bold()
                     Spacer()
-                    Button(action: {}) {
+                    Button(action: {
+                        isCategoryModalVisible = true
+                    }) {
                         Text("Add")
                             .frame(height: 30)
                             .padding(.horizontal, 12)
@@ -61,6 +64,7 @@ struct ContentView: View {
                     .padding(.vertical, 20)
                     .padding(.horizontal, 16)
                 }
+                .scrollIndicators(.hidden)
                 
                 UnevenRoundedRectangle(cornerRadii: .init(topLeading: 45, topTrailing: 45))
                     .fill(Color(hex: "#FAFAFA"))
@@ -75,7 +79,7 @@ struct ContentView: View {
                                 Spacer()
                                 
                                 Button(action: {
-                                    isModalVisible = true
+                                    isTaskModalVisible = true
                                 }) {
                                     Text("Add Task")
                                         .frame(height: 43)
@@ -132,9 +136,9 @@ struct ContentView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment:.topLeading)
             
-            AddTodoModal(isVisible: $isModalVisible) { title in
-                viewModel.addTodo(title: title)
-            }
+            AddCategoryModal(isVisible: $isCategoryModalVisible, onSave: viewModel.createCategory)
+            
+            AddTodoModal(isVisible: $isTaskModalVisible, onSave: viewModel.addTodo)
         }
     }
 }

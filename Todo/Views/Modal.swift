@@ -38,14 +38,11 @@ struct Modal<Content: View>: View, ModalProps {
         ZStack {
             Color(.black).opacity(opacity)
                 .onTapGesture(perform: {
-                    print("tap on bg")
                     closeModal()
                 })
             
-            VStack(alignment: .leading) {
-                content()
-            }
-            .padding(.top, 40)
+            content()
+            .padding(.top, 50)
             .padding([.horizontal, .bottom])
             .background {
                 ZStack {
@@ -55,6 +52,7 @@ struct Modal<Content: View>: View, ModalProps {
                             HStack {
                                 Spacer()
                                 Image(systemName: "xmark")
+                                    .font(.system(size: 24))
                                     .onTapGesture(perform: closeModal)
                             }
                             Spacer()
@@ -63,6 +61,7 @@ struct Modal<Content: View>: View, ModalProps {
                     }
                 }
             }
+            .padding()
             .offset(x: 0, y: offsetY)
         }
         .ignoresSafeArea()

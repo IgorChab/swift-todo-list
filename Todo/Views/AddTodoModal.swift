@@ -6,16 +6,23 @@
 //
 
 import SwiftUI
+import RealmSwift
 
 struct AddTodoModal: View {
     @Binding var isVisible: Bool
     var isClosable: Bool = true
-    let onSave: (_ title: String) -> Void
+    let onSave: (String, Category?) -> Void
+    @ObservedResults(Category.self) var categories
     @State private var title = ""
-    @State private var category = ""
+    @State private var selectedCategory: Category?
+    
+    private func clearModalState() {
+        title = ""
+        selectedCategory = nil
+    }
     
     var body: some View {
-        Modal(isVisible: $isVisible, isClosable: isClosable) {
+        Modal(isVisible: $isVisible, isClosable: isClosable, onClose: clearModalState) {
             VStack(alignment: .leading, spacing: 0) {
                 Text("Add Task")
                     .font(.title2)
@@ -33,17 +40,23 @@ struct AddTodoModal: View {
                     .padding(.bottom, 20)
                     .autocorrectionDisabled()
                 
-                Text("Category").foregroundStyle(Color(hex: "#757575"))
-                    .padding(.bottom, 8)
-                TextField("", text: $category)
-                    .padding(.horizontal, 12)
-                    .frame(height: 52)
-                    .background(Color(hex: "#EAEAEA"))
-                    .cornerRadius(8)
-                    .tint(Color(hex: "#757575"))
+                Picker("Category", selection: $selectedCategory) {
+                    Text("Not selected").tag(nil as Category?)
+                    ForEach(categories) {
+                        Text($0.title)
+                            .tag($0)
+                            .lineLimit(1)
+                    }
+                }
+                .pickerStyle(.navigationLink)
+                .foregroundStyle(Color(hex: "#757575"))
+                .padding(.horizontal, 12)
+                .frame(height: 52)
+                .background(Color(hex: "#EAEAEA"))
+                .cornerRadius(8)
                 
                 Button(action: {
-                    onSave(title)
+                    onSave(title, selectedCategory)
                     title = ""
                     isVisible = false
                 }) {
@@ -68,11 +81,16 @@ struct AddTodoModal: View {
 #Preview {
     @Previewable @State var isVisible = true
     
-    ZStack {
-        Button("toggle modal") {
-            isVisible = !isVisible
+    let realm = InMemoryRealmProvider.make(identifier: "AddTodoModal")
+    Category.createSampleData(in: realm)
+    return NavigationStack {
+        ZStack {
+            Button("toggle modal") {
+                isVisible = !isVisible
+            }
+            
+            AddTodoModal(isVisible: $isVisible, isClosable: true, onSave: {_,_ in })
         }
-        
-        AddTodoModal(isVisible: $isVisible, isClosable: true, onSave: {title in })
+        .environment(\.realm, realm)
     }
 }

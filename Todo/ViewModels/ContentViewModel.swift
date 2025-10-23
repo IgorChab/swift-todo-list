@@ -27,6 +27,18 @@ class ContentViewModel: ObservableObject {
         }
     }
     
+    func selectAllTasks() {
+        do {
+            try realm.write {
+                todos.forEach({
+                    $0.isChecked = true
+                })
+            }
+        } catch let error {
+            print("Failed to select all tasks in realm with error: \(error.localizedDescription)")
+        }
+    }
+    
     func selectCategory(_ category: Category) -> Void {
         if (selectedCategory == category) {
             selectedCategory = nil
@@ -46,12 +58,21 @@ class ContentViewModel: ObservableObject {
         }
     }
     
-    func addTodo(title: String) {
+    func addTodo(title: String, category: Category?) {
         do {
             try realm.write {
-                let todo = Todo(title: title, isChecked: false)
+                let todo = Todo(title: title, isChecked: false, category: nil)
+                
+                if let category {
+                    let localCategory = realm.create(Category.self, value: category, update: .modified)
+                    todo.category = localCategory
+                }
+                
+                
                 realm.add(todo)
             }
+            
+            observeTodos()
         } catch let error {
             print("Failed to add todo in realm with error: \(error.localizedDescription)")
         }

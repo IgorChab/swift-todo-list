@@ -10,23 +10,30 @@ import RealmSwift
 
 @main
 struct TodoApp: App {
+    let realm: Realm
+    
     init() {
-        let config = Realm.Configuration(
-            schemaVersion: 1, migrationBlock: { migration, oldSchemaVersion in
-                if oldSchemaVersion < 1 {
-                    // можно добавить обработку при необходимости
-                }
-            }, deleteRealmIfMigrationNeeded: true
-        )
-        Realm.Configuration.defaultConfiguration = config
-        if let realmURL = Realm.Configuration.defaultConfiguration.fileURL {
-            try? FileManager.default.removeItem(at: realmURL)
+        func createRealm() -> Realm {
+            var config = Realm.Configuration(
+                schemaVersion: 1,
+                deleteRealmIfMigrationNeeded: true
+            )
+            Realm.Configuration.defaultConfiguration = config
+            config.objectTypes = [Category.self, Todo.self]
+            config.deleteRealmIfMigrationNeeded = true
+            let realm = try! Realm()
+            return realm
         }
+        
+        realm = createRealm()
     }
     
     var body: some Scene {
         WindowGroup {
-            ContentView(viewModel: ContentViewModel(realm: try! Realm()))
+            NavigationStack {
+                ContentView(viewModel: ContentViewModel(realm: realm))
+                    .environment(\.realm, realm)
+            }
         }
     }
 }

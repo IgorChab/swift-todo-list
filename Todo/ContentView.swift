@@ -130,6 +130,19 @@ struct ContentView: View {
                             .listStyle(.plain)
                             .scrollContentBackground(.hidden)
                             .background(.clear)
+                            .scrollIndicators(.hidden)
+                            
+                            Button(action: viewModel.selectAllTasks) {
+                                Text("Select All Task")
+                                    .frame(height: 43)
+                                    .padding(.horizontal, 34)
+                            }
+                            .background(.black)
+                            .cornerRadius(100)
+                            .font(.title3)
+                            .bold()
+                            .foregroundStyle(.white)
+                            .padding(.top, 12)
                         }
                     }
                 

@@ -31,8 +31,10 @@ struct TodoApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationStack {
-                ContentView(viewModel: ContentViewModel(realm: realm))
-                    .environment(\.realm, realm)
+                OnboardingGate() {
+                    ContentView(viewModel: ContentViewModel(realm: realm))
+                        .environment(\.realm, realm)
+                }
             }
         }
     }

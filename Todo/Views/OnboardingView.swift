@@ -22,16 +22,20 @@ struct OnboardingView: View {
                     .font(.title3)
                     .multilineTextAlignment(.center)
                 
-                Circle()
-                    .strokeBorder(.gray, lineWidth: 1)
-                    .frame(width: 84)
-                    .overlay() {
-                        Circle()
-                            .frame(width: 66)
-                            .overlay() {
-                                Image("ArrowRight")
-                            }
-                    }.frame(height: 84)
+                    Circle()
+                        .strokeBorder(.gray, lineWidth: 1)
+                        .frame(width: 84)
+                        .overlay() {
+                            Circle()
+                                .frame(width: 66)
+                                .overlay() {
+                                    Image("ArrowRight")
+                                }
+                        }
+                        .frame(height: 84)
+                        .onTapGesture {
+                            UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
+                        }
             }
             .padding(.bottom, 150)
             .padding(.horizontal, 20)
